@@ -1,17 +1,21 @@
+import * as crypto from 'crypto';
 import * as Minio from 'minio';
-import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
-import { InjectModel } from '@nestjs/mongoose';
-import { Upload, UploadDocument } from './schemas/file.schema';
 import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
-import * as crypto from 'crypto';
+import { Readable } from 'stream';
+
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+
+import { Upload, UploadDocument } from './schemas/file.schema';
 
 @Injectable()
 export class StorageService {
   constructor(
     @InjectModel(Upload.name) private uploadModel: Model<UploadDocument>,
     @InjectMinio() private readonly minioClient: Minio.Client,
+    private configService: ConfigService,
   ) {}
 
   private readonly mimeTypeMapping: Record<string, string> = {
@@ -61,7 +65,11 @@ export class StorageService {
       mimeType,
     });
     upload.save();
-    await this.minioClient.putObject('reshare', hashedFileName, readableStream);
+    await this.minioClient.putObject(
+      this.configService.get('MINIO_BUCKET_NAME'),
+      hashedFileName,
+      readableStream,
+    );
   }
 
   async downloadFile(fileName: string) {
@@ -75,7 +83,10 @@ export class StorageService {
     //   throw new Error('File has expired.');
     // }
 
-    return await this.minioClient.getObject('reshare', fileName);
+    return await this.minioClient.getObject(
+      this.configService.get('MINIO_BUCKET_NAME'),
+      fileName,
+    );
   }
 
   async getFileRecord(fileName: string): Promise<UploadDocument> {

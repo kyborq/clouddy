@@ -90,7 +90,7 @@ export class AuthService {
   private async generateTokens(userId: string, login: string) {
     const accessToken = await this.jwtService.signAsync(
       { sub: userId, login },
-      { secret: this.jwtAccessSecret, expiresIn: '15m' },
+      { secret: this.jwtAccessSecret, expiresIn: '3d' },
     );
 
     const refreshToken = await this.jwtService.signAsync(

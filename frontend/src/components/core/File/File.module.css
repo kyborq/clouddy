@@ -35,6 +35,18 @@
   font-size: 14px;
 }
 
+.Info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+
+.Date {
+  font-size: 12px;
+  color: #c7c7c7;
+}
+
 @media (prefers-color-scheme: dark) {
   .File {
     background-color: #292d31;

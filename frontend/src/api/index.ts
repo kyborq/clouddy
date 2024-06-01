@@ -5,6 +5,7 @@ export enum TApiRoutes {
   REGISTER = "/auth/register",
   REFRESH = "/auth/refresh",
   CURRENT_USER = "/users/current",
+  CURRENT_FILES = "/storage",
 }
 
 export const api = axios.create({

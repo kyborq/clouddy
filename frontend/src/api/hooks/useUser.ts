@@ -5,9 +5,9 @@ import { useAuthStore } from "@/store/useStore";
 import { getCurrent } from "../services/user-service";
 
 export const useUser = () => {
-  const { user, setUser, clearUser } = useAuthStore();
+  const { setUser, clearUser } = useAuthStore();
 
-  useQuery(["user"], getCurrent, {
+  const { data, isLoading, isError } = useQuery(["user"], getCurrent, {
     onSuccess: (user) => {
       setUser(user);
     },
@@ -17,6 +17,8 @@ export const useUser = () => {
   });
 
   return {
-    user,
+    user: data,
+    isLoading,
+    isError,
   };
 };
