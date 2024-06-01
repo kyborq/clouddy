@@ -15,7 +15,7 @@ type Props = {
 };
 
 export const Sidebar = ({ children, user }: Props) => {
-  const sidebarExpand = useModal(true);
+  const sidebarExpand = useModal();
   const [theme, setTheme] = useState<string | null>(null);
 
   useEffect(() => {

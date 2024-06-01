@@ -17,7 +17,6 @@ export const AuthForm = ({ authModal }: Props) => {
   const { loginUser, isError, error } = useLogin();
 
   const handleLogin = (data: Credentials) => {
-    console.log(data);
     loginUser(data);
   };
 
