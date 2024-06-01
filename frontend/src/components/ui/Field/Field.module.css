@@ -1,0 +1,42 @@
+.Field {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.Label {
+  font-size: 13px;
+}
+
+.Container {
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 14px;
+  background-color: #e9ecef;
+  flex: 1;
+}
+
+.Input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 0;
+  flex: 1;
+  resize: none;
+  color: #212529;
+}
+
+.Input::placeholder {
+  color: #545c63;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Container {
+    background-color: #292d31;
+  }
+}

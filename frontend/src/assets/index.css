@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  background-color: #f8f9fa;
+  display: flex;
+  font-family: "Montserrat", sans-serif;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  color: #212529;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #212529;
+  }
+
+  #root {
+    color: #f8f9fa;
+  }
+}

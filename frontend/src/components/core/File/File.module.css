@@ -1,0 +1,42 @@
+.File {
+  width: 200px;
+  height: 200px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.043), 0 10px 24px #00000009;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: 250ms;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.File:hover {
+  box-shadow: 0 0 0 1px #00000010, 0 10px 24px rgba(0, 0, 0, 0.045);
+  transition: 250ms;
+}
+
+.File:active {
+  transform: scale(0.97);
+}
+
+.Icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.Title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .File {
+    background-color: #292d31;
+  }
+}

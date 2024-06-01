@@ -1,0 +1,16 @@
+.Wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 32px 0 0 32px;
+  box-shadow: 0 0 24px rgba(33, 37, 41, 0.025);
+  align-items: center;
+  padding: 44px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Wrap {
+    background-color: #25292d;
+  }
+}

@@ -1,0 +1,57 @@
+.Bubble {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 18px;
+  background-color: #e9ecef;
+  color: #212529;
+  border-radius: 5px 18px 18px 18px;
+  max-width: 80%;
+}
+
+.Bubble.Me {
+  border-radius: 18px 5px 18px 18px;
+  align-self: flex-end;
+  background-color: #1371ff;
+  color: #f8f9fa;
+}
+
+.Variants {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.Answer {
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #e9ecef;
+  padding: 4px 12px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 150ms;
+}
+
+.Answer:hover {
+  background-color: #d6d9dd;
+  transition: 150ms;
+}
+
+.Answer:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-color-scheme: dark) {
+  .Bubble {
+    background-color: #2f3438;
+    color: #f8f9fa;
+  }
+
+  .Answer {
+    background-color: #25292d;
+    color: #f8f9fa;
+  }
+
+  .Answer:hover {
+    background-color: #2f3438;
+  }
+}

@@ -1,0 +1,45 @@
+.Sidebar {
+  padding: 40px 32px;
+  width: 112px;
+  display: flex;
+  gap: 32px;
+  overflow: hidden;
+}
+
+.Navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.Logo {
+  cursor: pointer;
+  filter: drop-shadow(0 2px 6px rgba(37, 83, 231, 0.25))
+    drop-shadow(0 0px 24px rgba(37, 83, 231, 0.25));
+  transition: 250ms;
+}
+
+.Logo:active {
+  transform: scale(0.96);
+  transition: 250ms;
+}
+
+.Contents {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.Assistant {
+  flex: 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Logo {
+    filter: drop-shadow(0 2px 6px rgba(218, 223, 239, 0.25))
+      drop-shadow(0 0px 24px rgba(178, 188, 223, 0.25));
+  }
+}
