@@ -1,0 +1,21 @@
+.Error {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 24px;
+  user-select: none;
+  border-radius: 18px;
+  background-color: #e7343115;
+}
+
+.Title {
+  font-size: 12px;
+  font-weight: 500;
+  overflow-wrap: break-word;
+  color: #e73431a2;
+}
+
+.Text {
+  font-weight: 700;
+  font-size: 14px;
+}

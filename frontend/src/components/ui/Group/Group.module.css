@@ -1,0 +1,19 @@
+.Group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.Content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.Content.Horizontal {
+  flex-direction: row;
+}
+
+.Title {
+  font-size: 13px;
+}

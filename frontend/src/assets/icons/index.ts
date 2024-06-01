@@ -1,7 +1,10 @@
+import CloseIcon from "./close.svg?react";
 import FileIcon from "./file.svg?react";
 import FolderIcon from "./folder.svg?react";
 import HomeIcon from "./home.svg?react";
 import ImageIcon from "./image.svg?react";
+import LoaderIcon from "./loader.svg?react";
+import LockIcon from "./lock.svg?react";
 import TagIcon from "./tag.svg?react";
 import TrashIcon from "./trash.svg?react";
 import UploadIcon from "./upload.svg?react";
@@ -18,4 +21,7 @@ export {
   FolderIcon,
   ImageIcon,
   VideoIcon,
+  CloseIcon,
+  LockIcon,
+  LoaderIcon,
 };

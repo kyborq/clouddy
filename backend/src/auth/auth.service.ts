@@ -1,12 +1,14 @@
+import * as argon2 from 'argon2';
+import { UsersService } from 'src/users/users.service';
+
 import {
   BadRequestException,
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as argon2 from 'argon2';
-import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
 

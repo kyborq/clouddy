@@ -4,3 +4,5 @@ export * from "./Button";
 export * from "./Field";
 export * from "./Bubble";
 export * from "./Header";
+export * from "./Modal";
+export * from "./Group";
