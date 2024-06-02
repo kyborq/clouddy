@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Res,
@@ -33,10 +34,20 @@ export class StorageController {
     @Param('fileName') fileName: string,
     @Res() res: Response,
   ) {
-    return await this.storageService.downloadFile(fileName, res);
+    try {
+      const fileBuffer = await this.storageService.downloadFile(fileName);
+      res.set({
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Content-Length': fileBuffer.length,
+      });
+      res.end(fileBuffer);
+    } catch (error) {
+      throw new NotFoundException('File not found');
+    }
   }
 
-  @Post('upload')
+  @Post()
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return await this.storageService.uploadFile(file);

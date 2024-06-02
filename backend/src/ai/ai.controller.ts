@@ -9,7 +9,6 @@ export class AiController {
 
   @Get('image-caption/:fileName')
   async getImageCaption(@Param('fileName') fileName: string) {
-    console.log(fileName);
     return await this.aiService.getImageCaption(fileName);
   }
 

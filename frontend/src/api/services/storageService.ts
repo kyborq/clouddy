@@ -15,3 +15,22 @@ export const listFiles = async () => {
     }
   }
 };
+
+export const uploadFile = async (file: File) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    await api.post(TApiRoutes.STORAGE_FILES, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (err) {
+    const error = err as Error | AxiosError;
+    if (!axios.isAxiosError(error)) {
+      // TODO:
+      throw error;
+    }
+  }
+};

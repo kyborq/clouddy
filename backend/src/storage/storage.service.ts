@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { Client } from 'minio';
 import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
+import { Readable } from 'stream';
 
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -59,16 +60,24 @@ export class StorageService {
     await storedFile.save();
   }
 
-  async downloadFile(fileName: string, response: Response) {
+  async downloadFile(fileName: string) {
     const existedFile = await this.getFile(fileName);
     if (!existedFile) {
       throw new NotFoundException();
     }
 
     const stream = await this.minioClient.getObject(this.bucketName, fileName);
-    stream.pipe(response);
-    stream.on('error', (err) => {
-      response.status(500).send(err);
+    return new Promise<Buffer>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      stream.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+      stream.on('error', (err) => {
+        reject(err);
+      });
     });
   }
 
