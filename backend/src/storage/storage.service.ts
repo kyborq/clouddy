@@ -3,7 +3,7 @@ import { Client } from 'minio';
 import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -61,7 +61,9 @@ export class StorageService {
 
   async downloadFile(fileName: string, response: Response) {
     const existedFile = await this.getFile(fileName);
-    if (!existedFile) return;
+    if (!existedFile) {
+      throw new NotFoundException();
+    }
 
     const stream = await this.minioClient.getObject(this.bucketName, fileName);
     stream.pipe(response);
@@ -81,9 +83,18 @@ export class StorageService {
       file.buffer,
       async (error) => {
         if (error) return;
-        console.log(objectName, file.size);
         await this.saveFile(objectName, file.size);
       },
     );
+  }
+
+  async deleteFile(fileName: string) {
+    const file = await this.getFile(fileName);
+    if (!file) {
+      throw new NotFoundException();
+    }
+
+    await this.storageModel.findByIdAndDelete(file.id);
+    await this.minioClient.removeObject(this.bucketName, file.fileName);
   }
 }

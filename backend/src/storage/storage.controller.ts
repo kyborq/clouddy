@@ -2,6 +2,7 @@ import { Response } from 'express';
 
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -39,5 +40,10 @@ export class StorageController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return await this.storageService.uploadFile(file);
+  }
+
+  @Delete(':fileName')
+  async deleteFile(@Param('fileName') fileName: string) {
+    return await this.storageService.deleteFile(fileName);
   }
 }
