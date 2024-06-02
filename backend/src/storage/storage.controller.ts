@@ -1,3 +1,5 @@
+import { Request, Response } from 'express';
+
 import {
   Controller,
   Get,
@@ -6,17 +8,14 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AccessTokenGuard } from 'src/common/guards/access-token.guard';
-import { StorageService } from './storage.service';
-import { Request, Response } from 'express';
+
 import { UploadDto } from './dtos/upload.dto';
+import { StorageService } from './storage.service';
 
 @Controller('storage')
-@UseGuards(AccessTokenGuard)
 export class StorageController {
   constructor(private minioService: StorageService) {}
 
