@@ -1,115 +1,89 @@
-import * as crypto from 'crypto';
-import * as Minio from 'minio';
+import { Response } from 'express';
+import { Client } from 'minio';
 import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
-import { Readable } from 'stream';
 
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Upload, UploadDocument } from './schemas/file.schema';
+import { StorageDto } from './dtos/storage.dto';
+import { Storage, StorageDocument } from './schemas/storage.schema';
 
 @Injectable()
 export class StorageService {
-  private readonly mimeTypeMapping: Record<string, string> = {
-    jpg: 'image/jpeg',
-    jpeg: 'image/jpeg',
-    png: 'image/png',
-    gif: 'image/gif',
-    pdf: 'application/pdf',
-  };
   private readonly bucketName: string;
 
   constructor(
-    @InjectModel(Upload.name) private uploadModel: Model<UploadDocument>,
-    @InjectMinio() private readonly minioClient: Minio.Client,
+    @InjectModel(Storage.name) private storageModel: Model<StorageDocument>,
+    @InjectMinio() private readonly minioClient: Client,
     private configService: ConfigService,
   ) {
     this.bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
   }
 
-  private getMimeType(extension: string): string {
+  private toStorageDto(storage: StorageDocument): StorageDto | null {
     return (
-      this.mimeTypeMapping[extension.toLowerCase()] ||
-      'application/octet-stream'
+      storage && {
+        id: storage.id,
+        fileName: storage.fileName,
+        size: storage.size,
+        tags: storage.tags,
+        description: storage.description,
+      }
     );
   }
 
-  private hashFileName(fileName: string): string {
-    return crypto.createHash('sha256').update(fileName).digest('hex');
+  async createIfNoBucket() {
+    const exists = await this.minioClient.bucketExists(this.bucketName);
+    if (!exists) {
+      await this.minioClient.makeBucket(this.bucketName);
+    }
   }
 
-  private createReadableStream(buffer: Buffer): Readable {
-    const readableStream = new Readable();
-    readableStream._read = () => {};
-    readableStream.push(buffer);
-    readableStream.push(null);
-    return readableStream;
+  async getFile(fileName: string) {
+    const file = await this.storageModel.findOne({ fileName });
+    return this.toStorageDto(file);
   }
 
-  async uploadFile(
-    buffer: Buffer,
-    fileName: string,
-    userId: string,
-  ): Promise<void> {
-    const hashedFileName = this.hashFileName(fileName);
-    const readableStream = this.createReadableStream(buffer);
-    const size = buffer.length / (1024 * 1024);
-    const extension = fileName.split('.').pop();
-    const uploadDate = new Date();
-    const expirationDate = new Date(uploadDate.getTime() + 5 * 60000);
-    const mimeType = this.getMimeType(extension);
+  async listFiles() {
+    const files = await this.storageModel.find();
+    return files.map(this.toStorageDto);
+  }
 
-    const upload = new this.uploadModel({
-      alias: fileName,
-      uploadDate,
-      size,
-      extension,
-      expirationDate,
-      fileName: hashedFileName,
-      user: userId,
-      mimeType,
+  async saveFile(fileName: string, size: number) {
+    const existed = await this.getFile(fileName);
+    if (existed) return;
+
+    const storedFile = new this.storageModel({ fileName, size });
+    await storedFile.save();
+  }
+
+  async downloadFile(fileName: string, response: Response) {
+    const existedFile = await this.getFile(fileName);
+    if (!existedFile) return;
+
+    const stream = await this.minioClient.getObject(this.bucketName, fileName);
+    stream.pipe(response);
+    stream.on('error', (err) => {
+      response.status(500).send(err);
     });
-
-    try {
-      await upload.save();
-      await this.minioClient.putObject(
-        this.bucketName,
-        hashedFileName,
-        readableStream,
-      );
-    } catch (error) {
-      throw new InternalServerErrorException('Error uploading file');
-    }
   }
 
-  async downloadFile(fileName: string) {
-    const fileRecord = await this.uploadModel.findOne({ fileName }).exec();
-    if (!fileRecord) {
-      throw new NotFoundException('File not found.');
-    }
+  async uploadFile(file: Express.Multer.File) {
+    await this.createIfNoBucket();
 
-    try {
-      return await this.minioClient.getObject(this.bucketName, fileName);
-    } catch (error) {
-      throw new NotFoundException('Error retrieving file');
-    }
-  }
+    const objectName = file.originalname;
 
-  async getFileRecord(fileName: string): Promise<UploadDocument> {
-    const fileRecord = await this.uploadModel.findOne({ fileName }).exec();
-    if (!fileRecord) {
-      throw new NotFoundException('File record not found.');
-    }
-    return fileRecord;
-  }
-
-  async getAllFiles(userId: string): Promise<UploadDocument[]> {
-    return this.uploadModel.find({ user: userId }).exec();
+    this.minioClient.putObject(
+      this.bucketName,
+      objectName,
+      file.buffer,
+      async (error) => {
+        if (error) return;
+        console.log(objectName, file.size);
+        await this.saveFile(objectName, file.size);
+      },
+    );
   }
 }

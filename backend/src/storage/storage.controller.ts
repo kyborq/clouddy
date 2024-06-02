@@ -1,55 +1,43 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 import {
   Controller,
   Get,
   Param,
   Post,
-  Req,
   Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { UploadDto } from './dtos/upload.dto';
 import { StorageService } from './storage.service';
 
 @Controller('storage')
 export class StorageController {
-  constructor(private minioService: StorageService) {}
+  constructor(private storageService: StorageService) {}
 
   @Get()
-  async getAllFiles(@Req() request: Request) {
-    const userId = request.user['sub'];
-    const files = await this.minioService.getAllFiles(userId);
-
-    return files.map((file) => new UploadDto(file));
+  async listFiles() {
+    return await this.storageService.listFiles();
   }
 
-  @Get('download/:name')
-  async getFile(@Param('name') name: string, @Res() res: Response) {
-    const file = await this.minioService.downloadFile(name);
+  @Get(':fileName')
+  async getFile(@Param('fileName') fileName: string) {
+    return await this.storageService.getFile(fileName);
+  }
 
-    const fileRecord = await this.minioService.getFileRecord(name);
-
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${fileRecord.alias}"`,
-    );
-    res.setHeader('Content-Type', fileRecord.mimeType);
-
-    file.pipe(res);
+  @Get('download/:fileName')
+  async downloadFile(
+    @Param('fileName') fileName: string,
+    @Res() res: Response,
+  ) {
+    return await this.storageService.downloadFile(fileName, res);
   }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @Req() request: Request,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    const userId = request.user['sub'];
-    await this.minioService.uploadFile(file.buffer, file.originalname, userId);
-    return { message: 'Successfully uploaded file' };
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return await this.storageService.uploadFile(file);
   }
 }

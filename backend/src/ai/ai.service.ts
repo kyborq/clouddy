@@ -29,55 +29,49 @@ export class AiService {
   }
 
   async getImageCaption(fileName: string) {
-    try {
-      const imageStream = await this.storageService.downloadFile(fileName);
-      const imageBuffer = await this.streamToBuffer(imageStream);
-
-      const response = await fetch(this.hfEndpoint, {
-        headers: {
-          Authorization: `Bearer ${this.hfToken}`,
-          'Content-Type': 'application/octet-stream',
-        },
-        method: 'POST',
-        body: imageBuffer,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        return result[0].generated_text;
-      } else {
-        throw new InternalServerErrorException('Error getting image caption');
-      }
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Error processing image caption');
-    }
+    // try {
+    //   const imageStream = await this.storageService.downloadFile(fileName);
+    //   const imageBuffer = await this.streamToBuffer(imageStream);
+    //   const response = await fetch(this.hfEndpoint, {
+    //     headers: {
+    //       Authorization: `Bearer ${this.hfToken}`,
+    //       'Content-Type': 'application/octet-stream',
+    //     },
+    //     method: 'POST',
+    //     body: imageBuffer,
+    //   });
+    //   const result = await response.json();
+    //   if (response.ok) {
+    //     return result[0].generated_text;
+    //   } else {
+    //     throw new InternalServerErrorException('Error getting image caption');
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    //   throw new InternalServerErrorException('Error processing image caption');
+    // }
   }
 
   async getVideoCaption(fileName: string) {
-    try {
-      const videoStream = await this.storageService.downloadFile(fileName);
-      const videoBuffer = await this.streamToBuffer(videoStream);
-
-      const response = await fetch(this.videoCaptionEndpoint, {
-        headers: {
-          'Content-Type': 'application/octet-stream',
-        },
-        method: 'POST',
-        body: videoBuffer,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        return result.caption;
-      } else {
-        throw new InternalServerErrorException('Error getting video caption');
-      }
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Error processing video caption');
-    }
+    // try {
+    //   const videoStream = await this.storageService.downloadFile(fileName);
+    //   const videoBuffer = await this.streamToBuffer(videoStream);
+    //   const response = await fetch(this.videoCaptionEndpoint, {
+    //     headers: {
+    //       'Content-Type': 'application/octet-stream',
+    //     },
+    //     method: 'POST',
+    //     body: videoBuffer,
+    //   });
+    //   const result = await response.json();
+    //   if (response.ok) {
+    //     return result.caption;
+    //   } else {
+    //     throw new InternalServerErrorException('Error getting video caption');
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    //   throw new InternalServerErrorException('Error processing video caption');
+    // }
   }
 }

@@ -1,10 +1,12 @@
+import { NestMinioModule } from 'nestjs-minio';
+
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { Storage, StorageSchema } from './schemas/storage.schema';
 import { StorageController } from './storage.controller';
 import { StorageService } from './storage.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Upload, UploadSchema } from './schemas/file.schema';
-import { NestMinioModule } from 'nestjs-minio';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { ConfigService } from '@nestjs/config';
         secretKey: configService.getOrThrow('MINIO_SECRET_KEY'),
       }),
     }),
-    MongooseModule.forFeature([{ name: Upload.name, schema: UploadSchema }]),
+    MongooseModule.forFeature([{ name: Storage.name, schema: StorageSchema }]),
   ],
   controllers: [StorageController],
   providers: [StorageService],
