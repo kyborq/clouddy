@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { StorageModule } from './storage/storage.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
     StorageModule,
     AuthModule,
     UsersModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],

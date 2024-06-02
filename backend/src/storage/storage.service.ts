@@ -4,7 +4,11 @@ import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
 import { Readable } from 'stream';
 
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -12,12 +16,6 @@ import { Upload, UploadDocument } from './schemas/file.schema';
 
 @Injectable()
 export class StorageService {
-  constructor(
-    @InjectModel(Upload.name) private uploadModel: Model<UploadDocument>,
-    @InjectMinio() private readonly minioClient: Minio.Client,
-    private configService: ConfigService,
-  ) {}
-
   private readonly mimeTypeMapping: Record<string, string> = {
     jpg: 'image/jpeg',
     jpeg: 'image/jpeg',
@@ -25,6 +23,15 @@ export class StorageService {
     gif: 'image/gif',
     pdf: 'application/pdf',
   };
+  private readonly bucketName: string;
+
+  constructor(
+    @InjectModel(Upload.name) private uploadModel: Model<UploadDocument>,
+    @InjectMinio() private readonly minioClient: Minio.Client,
+    private configService: ConfigService,
+  ) {
+    this.bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
+  }
 
   private getMimeType(extension: string): string {
     return (
@@ -33,8 +40,16 @@ export class StorageService {
     );
   }
 
-  hashFileName(fileName: string): string {
+  private hashFileName(fileName: string): string {
     return crypto.createHash('sha256').update(fileName).digest('hex');
+  }
+
+  private createReadableStream(buffer: Buffer): Readable {
+    const readableStream = new Readable();
+    readableStream._read = () => {};
+    readableStream.push(buffer);
+    readableStream.push(null);
+    return readableStream;
   }
 
   async uploadFile(
@@ -42,21 +57,17 @@ export class StorageService {
     fileName: string,
     userId: string,
   ): Promise<void> {
-    const readableStream: Readable = new Readable();
-    readableStream._read = () => {};
-    readableStream.push(buffer);
-    readableStream.push(null);
-
     const hashedFileName = this.hashFileName(fileName);
+    const readableStream = this.createReadableStream(buffer);
     const size = buffer.length / (1024 * 1024);
     const extension = fileName.split('.').pop();
     const uploadDate = new Date();
     const expirationDate = new Date(uploadDate.getTime() + 5 * 60000);
     const mimeType = this.getMimeType(extension);
 
-    const upload = await this.uploadModel.create({
+    const upload = new this.uploadModel({
       alias: fileName,
-      uploadDate: uploadDate,
+      uploadDate,
       size,
       extension,
       expirationDate,
@@ -64,48 +75,41 @@ export class StorageService {
       user: userId,
       mimeType,
     });
-    upload.save();
-    await this.minioClient.putObject(
-      this.configService.get('MINIO_BUCKET_NAME'),
-      hashedFileName,
-      readableStream,
-    );
+
+    try {
+      await upload.save();
+      await this.minioClient.putObject(
+        this.bucketName,
+        hashedFileName,
+        readableStream,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading file');
+    }
   }
 
   async downloadFile(fileName: string) {
     const fileRecord = await this.uploadModel.findOne({ fileName }).exec();
     if (!fileRecord) {
-      throw new Error('File not found.');
+      throw new NotFoundException('File not found.');
     }
 
-    // const now = new Date();
-    // if (now > fileRecord.expirationDate) {
-    //   throw new Error('File has expired.');
-    // }
-
-    return await this.minioClient.getObject(
-      this.configService.get('MINIO_BUCKET_NAME'),
-      fileName,
-    );
+    try {
+      return await this.minioClient.getObject(this.bucketName, fileName);
+    } catch (error) {
+      throw new NotFoundException('Error retrieving file');
+    }
   }
 
   async getFileRecord(fileName: string): Promise<UploadDocument> {
     const fileRecord = await this.uploadModel.findOne({ fileName }).exec();
-
     if (!fileRecord) {
-      throw new Error('File record not found.');
+      throw new NotFoundException('File record not found.');
     }
-
     return fileRecord;
   }
 
-  async getAllFiles(userId: string) {
-    const result = await this.uploadModel
-      .find({
-        user: userId,
-      })
-      .exec();
-
-    return result;
+  async getAllFiles(userId: string): Promise<UploadDocument[]> {
+    return this.uploadModel.find({ user: userId }).exec();
   }
 }
