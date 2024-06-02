@@ -1,10 +1,11 @@
-import { UploadedFile } from "@/api/models/file-model";
-import { FileIcon, ImageIcon, VideoIcon } from "@/assets/icons";
+import { TStorageItem } from "@/api/models/storageModel";
+import { FileIcon } from "@/assets/icons";
+import { formatFileSize } from "@/utils/files";
 
 import styles from "./File.module.css";
 
 type Props = {
-  file: UploadedFile;
+  file: TStorageItem;
 };
 
 export const File = ({ file }: Props) => {
@@ -12,15 +13,11 @@ export const File = ({ file }: Props) => {
     <div className={styles.File}>
       <div className={styles.Info}>
         <div className={styles.Icon}>
-          {file.alias.match("jpg|png|jpeg|gif") && <ImageIcon width={20} />}
-          {file.alias.match("avi|mp4") && <VideoIcon width={20} />}
-          {file.alias.match("pdf|doc|docx|xls|xlsx") && <FileIcon width={20} />}
+          <FileIcon width={20} />
         </div>
-        <span className={styles.Title}>{file.alias}</span>
+        <span className={styles.Title}>{file.fileName}</span>
       </div>
-      <span className={styles.Date}>
-        {file.uploadDate && file.uploadDate.toString()}
-      </span>
+      <span className={styles.Date}>{formatFileSize(file.size)}</span>
     </div>
   );
 };

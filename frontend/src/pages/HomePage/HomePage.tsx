@@ -1,21 +1,18 @@
 import { ChangeEvent, useRef } from "react";
 
-import { useFiles } from "@/api/hooks/useFiles";
-import { useUpload } from "@/api/hooks/useUpload";
+import { useStorage } from "@/api/hooks/useStorage";
 import { UploadIcon } from "@/assets/icons";
 import { File } from "@/components/core";
 import { Button, Header } from "@/components/ui";
 
 export const HomePage = () => {
-  const { uploadFile } = useUpload();
-  const { files } = useFiles();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmitFile = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const currentFile = files[0];
-      uploadFile(currentFile);
+      // const currentFile = files[0];
+      // uploadFile(currentFile);
     }
   };
 
@@ -24,6 +21,8 @@ export const HomePage = () => {
       fileInputRef.current.click();
     }
   };
+
+  const files = useStorage();
 
   return (
     <div
@@ -49,8 +48,8 @@ export const HomePage = () => {
         onChange={handleSubmitFile}
       />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "26px" }}>
-        {files.map((file, index) => (
-          <File key={`${file.alias}-${index}`} file={file} />
+        {files.map((file) => (
+          <File key={file.id} file={file} />
         ))}
       </div>
     </div>
