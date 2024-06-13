@@ -2,4 +2,11 @@ name: myenv1
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python=3.9
+  - av
+  - fastapi=0.111.0
+  - numpy=1.26.4
+  - Pillow=10.3.0
+  - pytorch
+  - transformers=4.41.1
+  - uvicorn=0.30.1
