@@ -6,3 +6,4 @@ export * from "./Bubble";
 export * from "./Header";
 export * from "./Modal";
 export * from "./Group";
+export * from "./Popup";

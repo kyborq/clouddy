@@ -9,6 +9,11 @@
   padding: 44px;
 }
 
+.Wrap.Centered {
+  justify-content: center;
+  align-items: center;
+}
+
 @media (prefers-color-scheme: dark) {
   .Wrap {
     background-color: #25292d;
