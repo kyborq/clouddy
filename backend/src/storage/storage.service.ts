@@ -1,8 +1,6 @@
-import { Response } from 'express';
 import { Client } from 'minio';
 import { Model } from 'mongoose';
 import { InjectMinio } from 'nestjs-minio';
-import { Readable } from 'stream';
 
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
