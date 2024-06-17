@@ -21,6 +21,24 @@ export class StorageService {
     this.bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
   }
 
+  private getFileType(fileName: string): 'image' | 'video' | null {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    const videoExtensions = ['mp4', 'avi', 'mov', 'mkv'];
+
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    if (!extension) {
+      return null;
+    }
+
+    if (imageExtensions.includes(extension)) {
+      return 'image';
+    } else if (videoExtensions.includes(extension)) {
+      return 'video';
+    }
+
+    return null;
+  }
+
   private toStorageDto(storage: StorageDocument): StorageDto | null {
     return (
       storage && {
@@ -83,6 +101,7 @@ export class StorageService {
     await this.createIfNoBucket();
 
     const objectName = file.originalname;
+    await this.saveFile(objectName, file.size);
 
     this.minioClient.putObject(
       this.bucketName,
@@ -90,7 +109,6 @@ export class StorageService {
       file.buffer,
       async (error) => {
         if (error) return;
-        await this.saveFile(objectName, file.size);
       },
     );
   }

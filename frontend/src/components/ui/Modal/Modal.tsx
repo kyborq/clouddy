@@ -36,6 +36,7 @@ export const Modal = ({
   };
 
   useOnClickOutside(modalRef, handleClose);
+  useScrollLock();
 
   return (
     <AnimatePresence>

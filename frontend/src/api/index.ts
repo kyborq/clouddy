@@ -7,3 +7,10 @@ export enum TApiRoutes {
 export const api = axios.create({
   baseURL: "/api",
 });
+
+export const aiApi = axios.create({
+  baseURL: "/ai",
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+});

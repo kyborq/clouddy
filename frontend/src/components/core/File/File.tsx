@@ -6,11 +6,12 @@ import styles from "./File.module.css";
 
 type Props = {
   file: TStorageItem;
+  onSelect?: () => void;
 };
 
-export const File = ({ file }: Props) => {
+export const File = ({ file, onSelect }: Props) => {
   return (
-    <div className={styles.File}>
+    <div className={styles.File} onClick={onSelect}>
       <div className={styles.Info}>
         <div className={styles.Icon}>
           <FileIcon width={20} />

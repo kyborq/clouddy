@@ -10,8 +10,27 @@ export default defineConfig({
       "^/api/*": {
         target: "http://localhost:3000",
         changeOrigin: true,
-        secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "^/ai/*": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            // proxyReq.b
+            // if (req.headers["authorization"]) {
+            // proxyReq.setHeader("Authorization", req.headers["authorization"]);
+            // }
+            // if (req.headers["token"]) {
+            // proxyReq.setHeader("Token", req.headers["token"]);
+            // }
+          });
+          // proxy.on("proxyReq", (proxyRes, req) => {
+          // console.log(proxyRes);
+          // });
+        },
+
+        rewrite: (path) => path.replace(/^\/ai/, ""),
       },
     },
   },
