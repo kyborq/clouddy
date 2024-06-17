@@ -55,3 +55,9 @@
     background-color: #2f3438;
   }
 }
+
+.Attachment {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 12px;
+}

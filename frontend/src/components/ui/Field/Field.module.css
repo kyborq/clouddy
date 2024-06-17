@@ -39,4 +39,8 @@
   .Container {
     background-color: #292d31;
   }
+
+  .Input {
+    color: #ffffff;
+  }
 }

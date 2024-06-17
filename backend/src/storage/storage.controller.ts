@@ -38,7 +38,7 @@ export class StorageController {
       const fileBuffer = await this.storageService.downloadFile(fileName);
       res.set({
         'Content-Type': 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Content-Disposition': `inline; filename="${fileName}"`,
         'Content-Length': fileBuffer.length,
       });
       res.end(fileBuffer);

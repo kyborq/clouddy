@@ -3,6 +3,7 @@
   width: 112px;
   display: flex;
   gap: 32px;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -34,7 +35,7 @@
 .Assistant {
   flex: 1;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 @media (prefers-color-scheme: dark) {
