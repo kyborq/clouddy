@@ -7,6 +7,8 @@ import { Button, Field, Header, Modal } from "@/components/ui";
 import { useModal } from "@/hooks/useModal";
 import { useEffect, useState } from "react";
 import { useGetFile } from "./hooks/useFile";
+import { useMutation } from "react-query";
+import { aiApi } from "@/api";
 
 export const HomePage = () => {
   const { ref, handleSubmit, handleUpload } = useUpload();
@@ -15,6 +17,37 @@ export const HomePage = () => {
 
   const previewModal = useModal();
   const { caption, previewFile, getFile, isGenerating } = useGetFile();
+
+  const updateDescription = async ({
+    id,
+    description,
+  }: {
+    id: string;
+    description: string;
+  }) => {
+    await aiApi.put(
+      `/update-description/${id}`,
+      {
+        new_description: description,
+      },
+      {}
+    );
+  };
+
+  const [v, setV] = useState("");
+
+  useEffect(() => {
+    if (caption) {
+      setV(caption);
+    }
+  }, [caption]);
+
+  const updateDescriptionMutation = useMutation(updateDescription, {
+    onSuccess: () => {
+      // Invalidate and refetch
+      previewModal.close();
+    },
+  });
 
   useEffect(() => {
     if (selectedFile) {
@@ -53,6 +86,7 @@ export const HomePage = () => {
             onSelect={() => {
               previewModal.open();
               setSelectedFile(file);
+              setV(file.description || "");
             }}
           />
         ))}
@@ -70,11 +104,32 @@ export const HomePage = () => {
             />
           )}
           <p>
-            {!isGenerating ? (
+            {isGenerating ? (
+              <Loader />
+            ) : (
+              <>
+                <Field
+                  placeholder="Описание"
+                  value={v}
+                  onChange={(value) => setV(value)}
+                />
+                <Button
+                  label="Сохранить"
+                  onClick={() =>
+                    selectedFile.description &&
+                    updateDescriptionMutation.mutate({
+                      id: selectedFile.id,
+                      description: selectedFile.description || caption,
+                    })
+                  }
+                />
+              </>
+            )}
+            {/* {!isGenerating ? (
               <>{selectedFile.description || caption}</>
             ) : (
               <Loader />
-            )}
+            )} */}
           </p>
         </Modal>
       )}

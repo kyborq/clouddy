@@ -21,9 +21,18 @@ def generate_video_caption(video_bytes):
         if i in indices:
             frames.append(frame.to_ndarray(format="rgb24"))
     
+
+
     gen_kwargs = {"min_length": 10, "max_length": 20, "num_beams": 8}
     pixel_values = image_processor(frames, return_tensors="pt").pixel_values.to(device)
     tokens = video_model.generate(pixel_values, **gen_kwargs)
+    print("Shape of pixel_values tensor:", pixel_values)
+
+    print("Generated tokens:", tokens)
+
     caption = gpt2_tokenizer.batch_decode(tokens, skip_special_tokens=True)[0]
-    
+
+    print("Generated caption:", caption)
+
+
     return caption

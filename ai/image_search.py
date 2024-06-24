@@ -74,3 +74,6 @@ async def get_top_matches(query, top_k=5):
     top_matches = [(image, similarity) for image, similarity in similarities[:top_k] if 'fileName' in image]
 
     return top_matches
+
+async def encode_description(description):
+    return model.encode(description, convert_to_numpy=True).tolist()

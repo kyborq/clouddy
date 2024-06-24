@@ -36,7 +36,7 @@ export const useGetFile = () => {
       onSuccess: (data) => {
         getFilePreview(data.fileName);
       },
-    },
+    }
   );
 
   useEffect(() => {

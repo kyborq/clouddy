@@ -1,5 +1,5 @@
 # app.py
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import PlainTextResponse
 from PIL import Image
 import io
@@ -9,7 +9,7 @@ from bson.objectid import ObjectId
 
 from image_caption import generate_image_caption
 from video_caption import generate_video_caption
-from image_search import find_best_match, get_top_matches
+from image_search import encode_description, find_best_match, get_top_matches
 
 MONGO_DETAILS = "mongodb://localhost:27017"
 DATABASE_NAME = "reshare"
@@ -91,6 +91,26 @@ async def get_top_matches(query: str):
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/update-description/{record_id}")
+async def update_description(record_id: str, new_description: str = Form(...)):
+    # Update the description in the MongoDB document
+    result = await collection.update_one(
+        {"_id": ObjectId(record_id)},
+        {"$set": {"description": new_description}}
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Record not found")
+
+    # Recalculate the embedding for the new description
+    description_embedding = await encode_description(new_description)
+    await collection.update_one(
+        {"_id": ObjectId(record_id)},
+        {"$set": {"description_embedding": description_embedding}}
+    )
+
+    return {"message": "Description updated and embedding recalculated"}
 
 if __name__ == "__main__":
     import uvicorn

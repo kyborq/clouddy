@@ -8,14 +8,22 @@ type Props = {
   icon?: React.ReactNode;
   isMultiline?: boolean;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
-export const Field = ({ icon, isMultiline }: Props) => {
+export const Field = ({ icon, isMultiline, value, onChange }: Props) => {
   return (
     <label className={styles.Container}>
       {icon}
       {isMultiline && <TextareaAutosize className={styles.Input} />}
-      {!isMultiline && <input className={styles.Input} />}
+      {!isMultiline && (
+        <input
+          className={styles.Input}
+          value={value}
+          onChange={(e) => onChange && onChange(e.target.value)}
+        />
+      )}
     </label>
   );
 };
